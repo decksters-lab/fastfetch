@@ -32,14 +32,14 @@
         },
         { "type": "custom", "format": "┌────────────────────────────────────────────┐" },
         { "type": "cpu", "key": "  󰻠  CPU", "keyColor": "blue", "format": "{1}" },
-        { "type": "gpu", "key": "  󰢮  GPU", "keyColor": "blue", "format": "{1} Radeon Vega Series" },
+        { "type": "gpu", "key": "  󰢮  GPU", "keyColor": "blue", "format": "{1} {2}" },
         { "type": "memory", "key": "  󰍛  Memory", "keyColor": "blue", "format": "{1} / {2} {3}" },
         { "type": "disk", "key": "  󰋊  Disk", "keyColor": "magenta", "format": "{1} / {2} {3}" },
         { 
             "type": "command", 
             "key": "  󰅐  OS Age", 
             "keyColor": "magenta", 
-            "text": "echo $(($(($(date +%s) - $(stat -c %W /))) / 86400)) days without systemd",
+            "text": "echo $(($(($(date +%s) - $(stat -c %W /))) / 86400)) days",
             "format": "{1}" 
         },
         { "type": "uptime", "key": "  󰅐  Uptime", "keyColor": "magenta" },
