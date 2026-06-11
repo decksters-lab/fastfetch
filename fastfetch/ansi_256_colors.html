@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ANSI 256 Color Table</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --border: #2a2a32;
+    --text: #e8e8f0;
+    --muted: #6b6b7a;
+    --accent: #ff6e00;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    padding: 40px 32px;
+    min-height: 100vh;
+  }
+
+  header {
+    margin-bottom: 40px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+  }
+
+  .section-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 36px 0 14px;
+    padding-left: 2px;
+    border-left: 2px solid var(--accent);
+    padding-left: 10px;
+  }
+
+  .grid {
+    display: grid;
+    gap: 6px;
+  }
+
+  .grid-16  { grid-template-columns: repeat(8, 1fr); }
+  .grid-216 { grid-template-columns: repeat(12, 1fr); }
+  .grid-24  { grid-template-columns: repeat(8, 1fr); }
+
+  .swatch {
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    cursor: default;
+  }
+
+  .swatch:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    z-index: 10;
+    position: relative;
+  }
+
+  .swatch-block {
+    height: 44px;
+    width: 100%;
+  }
+
+  .swatch-info {
+    background: var(--surface);
+    padding: 5px 6px;
+    font-size: 0.6rem;
+    line-height: 1.4;
+  }
+
+  .swatch-id {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .swatch-code {
+    color: var(--muted);
+    font-size: 0.55rem;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .swatch-hex {
+    color: var(--accent);
+    font-size: 0.55rem;
+  }
+
+  footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>ANSI <span>256</span> Colors</h1>
+  <p class="subtitle">ESC[38;5;Nm — foreground &nbsp;|&nbsp; ESC[48;5;Nm — background</p>
+</header>
+
+<div class="section-label">0–15 · System Colors</div>
+<div class="grid grid-16" id="system"></div>
+
+<div class="section-label">16–231 · 6×6×6 Color Cube</div>
+<div class="grid grid-216" id="cube"></div>
+
+<div class="section-label">232–255 · Grayscale Ramp</div>
+<div class="grid grid-24" id="gray"></div>
+
+<footer>
+  Hover any swatch to highlight · ESC[38;5;Nm = foreground · ESC[48;5;Nm = background
+</footer>
+
+<script>
+// Standard system colors (0-15)
+const SYSTEM = [
+  '#000000','#800000','#008000','#808000',
+  '#000080','#800080','#008080','#c0c0c0',
+  '#808080','#ff0000','#00ff00','#ffff00',
+  '#0000ff','#ff00ff','#00ffff','#ffffff'
+];
+
+function cubeIndex(r, g, b) {
+  const v = [0, 95, 135, 175, 215, 255];
+  return `rgb(${v[r]},${v[g]},${v[b]})`;
+}
+
+function grayVal(n) {
+  const v = 8 + (n - 232) * 10;
+  return `rgb(${v},${v},${v})`;
+}
+
+function toHex(rgb) {
+  const m = rgb.match(/\d+/g);
+  if (!m) return rgb; // already hex
+  return '#' + m.map(x => parseInt(x).toString(16).padStart(2,'0')).join('');
+}
+
+function luminance(hex) {
+  const c = hex.replace('#','');
+  const r = parseInt(c.substr(0,2),16)/255;
+  const g = parseInt(c.substr(2,2),16)/255;
+  const b = parseInt(c.substr(4,2),16)/255;
+  return 0.299*r + 0.587*g + 0.114*b;
+}
+
+function makeSwatch(index, colorStr) {
+  const hex = colorStr.startsWith('#') ? colorStr : toHex(colorStr);
+  const lum = luminance(hex);
+  const textCol = lum > 0.45 ? '#111' : '#eee';
+
+  const div = document.createElement('div');
+  div.className = 'swatch';
+  div.title = `Color ${index} · ${hex} · \\e[38;5;${index}m`;
+
+  div.innerHTML = `
+    <div class="swatch-block" style="background:${colorStr}"></div>
+    <div class="swatch-info">
+      <span class="swatch-id">${index}</span>
+      <span class="swatch-hex">${hex}</span>
+      <span class="swatch-code">\\e[38;5;${index}m</span>
+    </div>`;
+  return div;
+}
+
+// System 0-15
+const sysEl = document.getElementById('system');
+SYSTEM.forEach((c, i) => sysEl.appendChild(makeSwatch(i, c)));
+
+// Cube 16-231
+const cubeEl = document.getElementById('cube');
+for (let r = 0; r < 6; r++)
+  for (let g = 0; g < 6; g++)
+    for (let b = 0; b < 6; b++) {
+      const idx = 16 + 36*r + 6*g + b;
+      cubeEl.appendChild(makeSwatch(idx, cubeIndex(r,g,b)));
+    }
+
+// Grayscale 232-255
+const grayEl = document.getElementById('gray');
+for (let i = 232; i <= 255; i++)
+  grayEl.appendChild(makeSwatch(i, grayVal(i)));
+</script>
+</body>
+</html>
