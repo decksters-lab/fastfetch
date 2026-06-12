@@ -2,6 +2,9 @@ This is my fastfetch config.
 To use it:
 Delete your current ~/.config/fastfetch folder and replace it with my fastfetch folder. Thats all you need to do. Actually you could probably even just merge the contents with your existing fastfetch folder. 
 
+UPDATED JUNE 12TH
+I added two more pngs from favpng.. they only let you grab two per day so.... enjoy...
+
 UPDATED JUNE 11th
 I added a python script named sqify.py , make sure you run chmod +x to this file so you can execute it. After you find some pngs you want to use, add them to the png folder and run the script. it will resize any png that isnt named sq_xxxx to 400x400 and add a nice padding so there is a uniformity to your fastfetch and it takes up roughly the same space no matter what picture you use. after running the script delete the source / non sq_xxx named files and you are good to go. 
 I added a bunch of new pngs that are to my taste
