@@ -88,12 +88,17 @@
       "type": "custom",
       "format": "┌───────────────────────────────────────────┐",
     },
-    { "type": "cpu", "key": "    CPU", "keyColor": "blue", "format": "{1}" },
+    { 
+      "type": "cpu", 
+      "key": "    CPU", 
+      "keyColor": "blue", 
+      "format": "{1}" 
+    },
     {
       "type": "gpu",
       "key": "  󰢮  GPU",
       "keyColor": "blue",
-      "format": "{1} Radeon Vega Series",
+      "format": "{1} {2}",
     },
     {
       "type": "memory",
@@ -121,4 +126,3 @@
     { "type": "colors", "symbol": "circle" },
   ],
 }
-
